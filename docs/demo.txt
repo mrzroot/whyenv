@@ -1,0 +1,66 @@
+### 1. 'I changed API_URL in .env.local but the app still calls the old server' (Vite)
+
+whyenv 0.1.0 · API_URL · /tmp/tmpgpidaubx/shop-vite
+
+== Vite (mode=development)
+effective value: 'http://old.example.test'   <- from: process environment (your shell)
+priority, highest first:
+  1. process environment (your shell)             'http://old.example.test'    WINS
+       probably set at: ~/.bashrc:3   export API_URL=http://old.example.test
+       (whyenv can only see files, not the process that exported it)
+  2. .env.development.local                       (no such file)
+  3. .env.development                             (no such file)
+  4. .env.local:1                                 'http://localhost:3000'      shadowed
+  5. .env:2                                       'https://prod.example.test'  shadowed
+
+✗ SHADOWED: edits to .env.local, .env are ignored: the shell already exports API_URL
+    why:  vite never overrides a variable that already exists in the process environment; different value(s) in: .env.local (line 1), .env (line 2).
+    fix:  remove it from this shell (bash/zsh: `unset API_URL`; PowerShell: `Remove-Item Env:API_URL`; cmd: `set API_URL=`) and restart the dev server; or change the shell value instead. Probably set in: ~/.bashrc:3.
+
+· NOTE: API_URL does not start with VITE_
+    why:  vite only exposes VITE_* variables to browser code; reading it there gives undefined (server code and config files can read it)
+    fix:  rename to VITE_API_URL if the browser needs it. Never put secrets in VITE_* variables: they end up in the public bundle.
+
+1 confirmed shadowed value(s).
+
+
+### 2. 'next build was fine, but the site shows the old API URL' (Next.js, mode=production)
+
+whyenv 0.1.0 · NEXT_PUBLIC_API_URL · /tmp/tmpgpidaubx/blog-next
+
+== Next.js (NODE_ENV=production)
+effective value: 'https://api.example.test'   <- from: .env.production:1
+priority, highest first:
+  1. process environment (your shell)             -
+  2. .env.production.local                        (no such file)
+  3. .env.local                                   (no such file)
+  4. .env.production:1                            'https://api.example.test'   WINS
+  5. .env                                         (no such file)
+
+· NOTE: .env.production:1: CRLF line ending (Windows): most dotenv loaders strip it, but bash `source` and some other tools keep a trailing \r in the value
+
+? CHECK: .next/ is older than the .env file that defines NEXT_PUBLIC_API_URL
+    why:  NEXT_PUBLIC_* values are inlined into the bundle when you build; the existing build still contains the old value
+    fix:  rebuild (and restart `next start` / re-deploy); editing .env after a build changes nothing
+
+no shadowed values.
+
+
+### 3. 'I set LOG_LEVEL=warn in web.env and nothing changed' (Docker Compose)
+
+whyenv 0.1.0 · LOG_LEVEL · /tmp/tmpgpidaubx/stack
+
+== Docker Compose: service 'web' container environment
+effective value: 'debug'   <- from: environment: LOG_LEVEL in docker-compose.yml
+priority, highest first:
+  1. environment: LOG_LEVEL in docker-compose.yml 'debug'                      WINS
+  2. web.env:1                                    'warn'                       shadowed
+
+✗ SHADOWED: web.env is ignored: environment: LOG_LEVEL in docker-compose.yml wins
+    why:  environment: LOG_LEVEL in docker-compose.yml is read first and has a different value than: web.env (line 1).
+    fix:  change the value in environment: LOG_LEVEL in docker-compose.yml, or delete that line if you want the others to apply.
+
+· NOTE: a container keeps the environment it was created with
+    why:  after editing any of these sources, run `docker compose up -d --force-recreate web` (a running container does not re-read them)
+
+1 confirmed shadowed value(s).
