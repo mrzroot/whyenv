@@ -125,7 +125,10 @@ def test_compose_not_referenced(proj):
 
 def test_windows_registry_provenance(proj):
     d, h = proj({"package.json": VITE, ".env": "A=file\n"})
-    reg = lambda n: [system.Where("User (HKCU\\Environment)", n + "=…", "setx")]
+
+    def reg(name):
+        return [system.Where("User (HKCU\\Environment)", name + "=…", "setx")]
+
     r = resolve.resolve("A", d, env={"A": "setx"}, home=h, windows=True, registry=reg)
     s = sec(r)
     assert s.sources[0].where[0].where.startswith("User")
