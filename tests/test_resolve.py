@@ -129,7 +129,7 @@ def test_windows_registry_provenance(proj):
     r = resolve.resolve("A", d, env={"A": "setx"}, home=h, windows=True, registry=reg)
     s = sec(r)
     assert s.sources[0].where[0].where.startswith("User")
-    assert "User (HKCU" in [f for f in s.findings if f.level == "SHADOWED"][0].fix
+    assert "User (HKCU" in next(f for f in s.findings if f.level == "SHADOWED").fix
 
 
 def test_direnv_envrc_found_in_parent(proj):
