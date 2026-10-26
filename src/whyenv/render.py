@@ -4,7 +4,7 @@ import json
 from typing import List
 
 from . import __version__
-from .resolve import Report, Section
+from .resolve import Report
 
 
 def _c(t: str, code: str, on: bool) -> str:
