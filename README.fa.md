@@ -14,7 +14,7 @@
 
 ```text
 $ whyenv API_URL
-whyenv 0.1.0 · API_URL · /tmp/tmpgpidaubx/shop-vite
+whyenv 0.1.1 · API_URL · /tmp/tmpgpidaubx/shop-vite
 
 == Vite (mode=development)
 effective value: 'http://old.example.test'   <- from: process environment (your shell)
