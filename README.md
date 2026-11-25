@@ -69,6 +69,19 @@ uvx --from git+https://github.com/mrzroot/whyenv whyenv --demo
 pip install -e .                                         # from a clone
 ```
 
+
+## Find the source before editing another .env file
+
+Reproduce the precedence problem in a temporary project. On your project, run the check from the same startup environment and match the actual framework and mode.
+
+```sh
+whyenv --demo
+```
+
+Distinguish the winning source from the file you expected. A build-time client setting may require rebuilding instead of restarting. Leave --show-values off in shared shells and redact the report before posting.
+
+See the [bilingual scenario on the project page](docs/index.html#first-check).
+
 ## Usage
 
 ```sh
